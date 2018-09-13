@@ -25,12 +25,13 @@ from . import __version__ as VERSION
 from commands.prompts import invokePrompt
 from pypingcli.sockets.util import startDaemonServer
 import os
+import sys
 import globals
+
 # use prompt-toolkit
 def main():
     """Main CLI entrypoint."""
     import commands
-    
     globals.init()
     globals.loadConfig()
     os.system('clear')
@@ -44,6 +45,8 @@ def main():
             command = command(options)
             command.run()
     startDaemonServer()
-    while True:
-        invokePrompt()
+    while invokePrompt() != -1:
+        pass
+    sys.exit(0)
+    
     

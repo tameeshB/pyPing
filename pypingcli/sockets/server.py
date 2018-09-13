@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import socket
+import globals
 
 class Server(object):
     def __init__(self):
@@ -13,7 +14,7 @@ class Server(object):
 
         # listen for incoming connections (server mode) with one connection at a time
         sock.listen(1)
-        while True:  
+        while True:
             # wait for a connection
             print ('waiting for a connection')
             connection, client_address = sock.accept()

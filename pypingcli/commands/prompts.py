@@ -10,7 +10,9 @@ def invokePrompt():
     else:
         commands = ['connect','accept','edit username','ping IP','my IP']
         run = printPrompt(commands)
-        if run == "connect":
+        if run == -1:
+            return -1
+        elif run == "connect":
             sockets.Client()
         elif run == "accept":
             sockets.Server()
@@ -34,5 +36,5 @@ def printPrompt(options):
         print("Invalid Option.")
         
     if tmpInput == 0:
-        sys.exit(0)
+        return -1
     return options[tmpInput-1]

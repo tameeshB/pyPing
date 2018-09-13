@@ -12,5 +12,6 @@ def getSelfIP():
 
 def startDaemonServer():
     t1 = threading.Thread(target=Server, name='t1')
+    t1.daemon = True
     t1.start() 
-
+    
