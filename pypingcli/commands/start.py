@@ -4,7 +4,7 @@ import globals
 from os import path
 import json
 import sys
-
+import pypingcli.sockets.util
 class Start(Base):
     
     def run(self):
@@ -21,6 +21,7 @@ class Start(Base):
         else:
             print "Welcome back, ",
         print(globals.user + "!")
+        print('Running with IP: ' + pypingcli.sockets.util.getSelfIP())
     def checkConfig(self):
         """
         Checks if initialisation is done before

@@ -1,6 +1,7 @@
 # globals.py
 
 from os.path import abspath, dirname, join
+from os import path
 import json
 
 def init():
@@ -22,7 +23,9 @@ def init():
 
 def loadConfig():
     global user
-    with open(configFile) as jsonConfigData:
-        data = json.load(jsonConfigData)
-    user = data['user']
+    global configFile
+    if path.exists(configFile):
+        with open(configFile) as jsonConfigData:
+            data = json.load(jsonConfigData)
+        user = data['user']
     

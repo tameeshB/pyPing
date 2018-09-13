@@ -23,10 +23,10 @@ from inspect import getmembers, isclass
 from docopt import docopt
 from . import __version__ as VERSION
 from commands.prompts import invokePrompt
+from pypingcli.sockets.util import startDaemonServer
 import os
 import globals
-# use prompt-toolkit later
-
+# use prompt-toolkit
 def main():
     """Main CLI entrypoint."""
     import commands
@@ -43,6 +43,7 @@ def main():
             command = [command[1] for command in commands if command[0] != 'Base'][0]
             command = command(options)
             command.run()
+    startDaemonServer()
     while True:
         invokePrompt()
     

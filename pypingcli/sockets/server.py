@@ -4,21 +4,15 @@ import socket
 
 class Server(object):
     def __init__(self):
-        import socket
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        print(s.getsockname()[0])
-        s.close()
         # create TCP/IP socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # bind the socket to the port 23456
         server_address = ('', 23456)  
-        print ('starting up on %s port %s' % server_address)  
+        print ('starting up server on %s port %s' % server_address)  
         sock.bind(server_address)
 
         # listen for incoming connections (server mode) with one connection at a time
         sock.listen(1)
-
         while True:  
             # wait for a connection
             print ('waiting for a connection')
