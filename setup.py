@@ -19,16 +19,15 @@ class RunTests(Command):
 
     def run(self):
         """Run all tests!"""
-        errno = call(['py.test', '--cov=skele', '--cov-report=term-missing'])
+        errno = call(['py.test', '--cov=pypingcli', '--cov-report=term-missing'])
         raise SystemExit(errno)
 
 setup(
-    
     name = 'pypingcli',
     version = __version__,
     license='MIT',
     long_description=open('README').read(),
-    url='https://github.com/tameeshB/pyPing',
+    url='https://github.com/tameeshB/pyPingCLI',
     author='Tameesh Biswas',
     author_email='g@tameesh.in',
     classifiers = [
