@@ -1,28 +1,34 @@
 #!/usr/bin/env python3
 
 import socket
+import json
+import globals
 from pypingcli.messaging.socketAction import action
 class Client(object):
-    def __init__(self):
+    def __init__(self, ip = None):
         # load additional Python modules
         import socket  
         import time
 
         # create TCP/IP socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ip_address = raw_input('Enter IP(IPv4) to connect to: ')
+        if ip == None:
+            ip_address = raw_input('Enter IP(IPv4) to connect to: ')
+        else:
+            ip_address = ip_address
         server_address = (ip_address, 23456)  
         sock.connect(server_address)  
         print ("connecting to %s" % (ip_address))
         init = json.dumps({'e':'name','dir':'get'})
         sock.sendall(init)
-        while True:
-            data = socket.recv(64)
-            if data:
-                connection.sendall(action(data))
-            else:
-                # connection.sendall(action(data))
-                break
+        time.sleep(2)
+        init = json.dumps({'e':'name','dir':'post','d':globals.user})
+        sock.sendall(init)
+        time.sleep(2)
+        init = json.dumps({'e':'msg','d':"Hi!"})
+        sock.sendall(init)
+        # sock.sendall(init)
+        # while True
         # define example data to be sent to the server
         # temperature_data = ["15", "22", "21", "26", "25", "19"]  
         # for entry in temperature_data:  

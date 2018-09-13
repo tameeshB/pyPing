@@ -6,7 +6,7 @@ def action(data):
         if data['dir'] == "get":
             return json.dumps({'e':'name','dir':'post','d':globals.user})
         elif data['dir'] == "post":
-            print("connected with {}" % data['d'])
+            print("connected with {}".format(data['d']))
             globals.state['connectedTo'] = data['d']
     elif data['e'] == "key":
         if data['dir'] == "get":
@@ -15,6 +15,7 @@ def action(data):
             pass
     elif data['e'] == "msg":
         print("[{}]: {}" % globals.state['connectedTo'],data['d'])
+    return json.dumps({'e':'idle'})
 
 def sendMsg():
     try:

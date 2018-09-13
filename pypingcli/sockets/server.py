@@ -3,6 +3,7 @@
 import socket
 import globals
 from pypingcli.messaging.socketAction import action
+from pypingcli.sockets.client import Client
 
 class Server(object):
     def __init__(self):
@@ -16,11 +17,13 @@ class Server(object):
             try:
                 # show who connected to us
                 print ('connection from ', client_address)
+                Client(client_address[0])
                 globals.state["connected"] = True
                 # receive the data in small chunks and print it
                 while True:
                     data = connection.recv(64)
                     if data:
+                        # print("recv:",data)
                         connection.sendall(action(data))
                     else:
                         # connection.sendall(action(data))
