@@ -26,7 +26,7 @@ setup(
     
     name = 'pypingcli',
     version = __version__,
-    license='Creative Commons Attribution-Noncommercial-Share Alike license',
+    license='MIT',
     long_description=open('README').read(),
     url='https://github.com/tameeshB/pyPingCLI',
     author='Tameesh Biswas',
@@ -34,7 +34,7 @@ setup(
     classifiers = [
         'Intended Audience :: End Users/Desktop',
         'Topic :: Utilities',
-        'License :: Public Domain',
+        'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2',
