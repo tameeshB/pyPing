@@ -28,7 +28,7 @@ setup(
     version = __version__,
     license='MIT',
     long_description=open('README').read(),
-    url='https://github.com/tameeshB/pyPingCLI',
+    url='https://github.com/tameeshB/pyPing',
     author='Tameesh Biswas',
     author_email='g@tameesh.in',
     classifiers = [
