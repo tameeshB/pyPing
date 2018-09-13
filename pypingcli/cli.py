@@ -20,21 +20,29 @@ Help:
 """
 
 from inspect import getmembers, isclass
- 
 from docopt import docopt
-
 from . import __version__ as VERSION
+from commands.prompts import invokePrompt
+import os
+import globals
+# use prompt-toolkit later
 
 def main():
     """Main CLI entrypoint."""
     import commands
+    
+    globals.init()
+    globals.loadConfig()
+    os.system('clear')
     options = docopt(__doc__, version=VERSION)
-    print(options)
+    # print(options)
     for k, v in options.iteritems():
-        print(k,v)
         if hasattr(commands, k):
             module = getattr(commands, k)
             commands = getmembers(module, isclass)
             command = [command[1] for command in commands if command[0] != 'Base'][0]
             command = command(options)
             command.run()
+    while True:
+        invokePrompt()
+    
