@@ -1,14 +1,20 @@
 import globals
 import sys
 from pypingcli import sockets
-
+from pypingcli.messaging.socketAction import sendMsg
 def invokePrompt():
     """State based prompt calls."""
     commands = []
     if globals.state['connected'] == True:
-        pass
+        commands = ['send','disconnect']
+        run = printPrompt(commands)
+        if run == -1:
+            return -1
+        elif run == "send":
+            sendMsg()
+        
     else:
-        commands = ['connect','accept','edit username','ping IP','my IP']
+        commands = ['connect','edit username','ping IP','my IP']
         run = printPrompt(commands)
         if run == -1:
             return -1

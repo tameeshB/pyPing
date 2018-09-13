@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import socket
-
+from pypingcli.messaging.socketAction import action
 class Client(object):
     def __init__(self):
         # load additional Python modules
@@ -14,16 +14,24 @@ class Client(object):
         server_address = (ip_address, 23456)  
         sock.connect(server_address)  
         print ("connecting to %s" % (ip_address))
-
+        init = json.dumps({'e':'name','dir':'get'})
+        sock.sendall(init)
+        while True:
+            data = socket.recv(64)
+            if data:
+                connection.sendall(action(data))
+            else:
+                # connection.sendall(action(data))
+                break
         # define example data to be sent to the server
-        temperature_data = ["15", "22", "21", "26", "25", "19"]  
-        for entry in temperature_data:  
-            print ("data: %s" % entry)
-            new_data = str("temperature: %s\n" % entry).encode("utf-8")
-            sock.sendall(new_data)
+        # temperature_data = ["15", "22", "21", "26", "25", "19"]  
+        # for entry in temperature_data:  
+        #     print ("data: %s" % entry)
+        #     new_data = str("temperature: %s\n" % entry).encode("utf-8")
+        #     sock.sendall(new_data)
 
-            # wait for two seconds
-            time.sleep(2)
+        #     # wait for two seconds
+        #     time.sleep(2)
 
-        # close connection
+        # # close connection
         sock.close()  
