@@ -20,7 +20,7 @@ def chat_client():
         sys.exit()
 
     print 'Connected to remote host. You can start sending messages'
-    sys.stdout.write('.{}> '.format(globals.user)); sys.stdout.flush()
+    sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush()
      
     while 1:
         socket_list = [sys.stdin, s]
@@ -38,11 +38,11 @@ def chat_client():
                 else :
                     #print data
                     sys.stdout.write(data)
-                    sys.stdout.write('.{}> '.format(globals.user)); sys.stdout.flush()     
+                    sys.stdout.write('.{:=^10}>s '.format(globals.user)); sys.stdout.flush()     
             
             else :
                 # user entered a message
                 msg = sys.stdin.readline()
-                s.send('.{}> {}'.format(globals.user,msg))
-                sys.stdout.write('.{}> '.format(globals.user)); sys.stdout.flush() 
+                s.send('.{:=^10}> {}'.format(globals.user,msg))
+                sys.stdout.write('.{:=^10s}> '.format(globals.user)); sys.stdout.flush() 
 

@@ -29,11 +29,11 @@ def chat_server():
                 print "Client (%s, %s) connected" % addr
                  
                 broadcast(server_socket, sockfd, "[%s:%s] entered our chatting room\n" % addr)
-                sys.stdout.write('.{}> '.format(globals.user)); sys.stdout.flush()
+                sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush()
             elif sock == sys.stdin:
                 msg = sys.stdin.readline()
-                broadcast(server_socket, sock, "\r" + '.{}> '.format(globals.user) + msg)
-                # sys.stdout.write('.{}> '.format(globals.user)); sys.stdout.flush() 
+                broadcast(server_socket, sock, "\r" + '.{:=^10}> {}'.format(globals.user,msg))
+                # sys.stdout.write('\r.{:=^10}> '.sformat(globals.user)); sys.stdout.flush() 
             # a message from a client, not a new connection
             else:
                 # process data recieved from client, 
@@ -43,7 +43,7 @@ def chat_server():
                     if data:
                         # there is something in the socket
                         broadcast(server_socket, sock, "\r" + data)  
-                        sys.stdout.write('.{}> '.format(globals.user)); sys.stdout.flush() 
+                        sys.stdout.write('\r.{:=^10}> '.format(globals.user)); sys.stdout.flush() 
                     else:
                         # remove the socket that's broken    
                         if sock in SOCKET_LIST:
@@ -61,8 +61,7 @@ def chat_server():
     
 # broadcast chat messages to all connected clients
 def broadcast (server_socket, sock, message):
-    sys.stdout.flush()
-    sys.stdout.write(message);sys.stdout.flush()
+    sys.stdout.write(message+"\033[K");sys.stdout.flush()
     for socket in SOCKET_LIST:
         # send the message only to peer
         if socket != server_socket and socket != sock :
