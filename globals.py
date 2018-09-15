@@ -2,6 +2,7 @@
 
 from os.path import abspath, dirname, join
 from os import path
+from pypingcli.cryptoManager.keyManager import KeyManager
 import json
 
 def init():
@@ -11,10 +12,12 @@ def init():
     global state
     global port
     global internetServerIP
+    global keyMgrInstance
     thisDir = abspath(dirname(__file__))
     configFile = join(thisDir, 'config.json')
     user = None
     internetServerIP = '35.200.238.63'
+    keyMgrInstance = KeyManager()
     state = {
         'connected' : False,
         'start' : False,

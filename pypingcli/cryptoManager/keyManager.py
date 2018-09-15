@@ -8,12 +8,12 @@ import os
 import pickle
 
 class KeyManager(AESCipher):
-    pubKey = None
-    __privKey = None
-    __symmKey = None
-    RSAInstance = None
-    # AESInstance = None # Inherited
-
+    def __init__(self):
+        self.pubKey = None
+        self.__privKey = None
+        self.__symmKey = None
+        self.RSAInstance = None
+        # self.AESInstance = None # Inherited
     def generateSymmKey(self):
         self.__symmKey = self.gen_password(32)
         self.setKeyHash(self.__symmKey)

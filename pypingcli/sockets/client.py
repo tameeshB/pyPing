@@ -3,6 +3,7 @@
 import sys, socket, select
 import globals
 import pypingcli.util
+from pypingcli.cryptoManager.keyManager import KeyManager
 
 def chat_client(argHost=None):
 
@@ -11,17 +12,33 @@ def chat_client(argHost=None):
      
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(2)
-     
+    # states
+    accepted = False
+    symmkeyRecieved = False
+    keyMgrInstance = KeyManager()
+    sslEstablished = False
+
+    # generate keys
+    pubKey = None
+    # print("1",keyMgrInstance.keyStatus())
+    # keyMgrInstance.generateAsymKeys()
+    # print("2",keyMgrInstance.keyStatus(),keyMgrInstance.pubKey)
+    # if keyMgrInstance.keyStatus == 0:
+        # print('ooo')
+    pubKey = keyMgrInstance.generateAsymKeys()
+        # print('pubKeyset',pubKey)
+        # print(keyMgrInstance.keyStatus)
     # connect to remote host
     try :
+        sys.stdout.write('Awaiting connection invitation response...')
         s.connect((host, port))
     except :
         print 'Unable to connect'
         sys.exit()
-
-    print 'Connected to remote host. You can start sending messages'
-    sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush()
-     
+    s.send('/im:{}'.format(globals.user))
+    # print 'Connected to remote host. You can start sending messages'
+    if host == globals.internetServerIP:
+        print("/**\n\tCaution:\n\t\tThis is a public and unencrypted channel.\n\t\tAnyone online can read the messages sent here.\n **/")
     while 1:
         socket_list = [sys.stdin, s]
          
@@ -36,11 +53,39 @@ def chat_client(argHost=None):
                     print '\nDisconnected from chat server'
                     sys.exit()
                 else :
-                    #print data
-                    sys.stdout.write(data)
-                    sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush()     
-            
+                    if sslEstablished:
+                        sys.stdout.write(data)
+                        sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush()
+                    elif not accepted:
+                        if data == "/asymkey?:":
+                            accepted = True
+                            sys.stdout.write('\nConnection invitation accepted.                 ')
+                            sys.stdout.write('\nInitiating crypto handshake sequence...')
+                            sys.stdout.write("\nEncryption Key handshake:\n\tPart one:\n\t\tTransmitting asymmetric key.\n")
+                            s.send('/asymkey:{}'.format(pubKey))
+                            continue
+                        else:
+                            continue
+                    elif not symmkeyRecieved:
+                        if data[:12] == '/encsymmkey:':
+                            symmkeyRecieved = True
+                            sys.stdout.write("\n\tPart two:\n\t\tRecieving and deciphering RSA encrypted AES256 symmetric key..\n")
+                            symmKeyCipherText = data[12:]
+                            if keyMgrInstance.decryptKey(symmKeyCipherText):
+                                s.send('/secureconn:')
+                            continue
+                        else:
+                            continue
+                    elif not sslEstablished:
+                        if data[:4] == "/im:":
+                            sslEstablished = True
+                            sys.stdout.write("\nEstablished secure connection with '{}'\n".format(data[4:]))
+                            sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush() 
+                            continue
+
             else :
+                if not sslEstablished:
+                    continue
                 # user entered a message
                 msg = sys.stdin.readline()
                 s.send('.{:=^10}> {}'.format(globals.user,msg))
