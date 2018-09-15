@@ -10,9 +10,11 @@ def init():
     global user
     global state
     global port
+    global internetServerIP
     thisDir = abspath(dirname(__file__))
     configFile = join(thisDir, 'config.json')
     user = None
+    internetServerIP = '35.200.238.63'
     state = {
         'connected' : False,
         'start' : False,
@@ -22,6 +24,7 @@ def init():
         'pinging' : False
     }
     port = 9009
+    
 
 def loadConfig():
     global user

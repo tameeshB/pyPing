@@ -15,25 +15,27 @@ def invokePrompt():
             sendMsg()
         
     else:
-        commands = ['connect','accept','ter','edit username','ping IP','my IP']
+        commands = ['Connect','Accept','Go online','Edit username',]
         run = printPrompt(commands)
         threadVar = None
         if run == -1:
             return -1
-        elif run == "connect":
+        elif run == "Connect":
             pypingcli.sockets.chat_client()
             # pypingcli.sockets.server.test()
             # print("threadVar.isAlive()",threadVar.isAlive() if threadVar else "None")
             # sockets.Client()
         # elif run == "ter":
         #     globals.state['connected'] = 't'
-        elif run == "accept":
+        elif run == "Accept":
             # threadVar = pypingcli.sockets.util.startDaemonServer()
             pypingcli.sockets.chat_server()
             # sockets.Server()
             # pass
-        elif run == 'edit username':
+        elif run == 'Edit username':
             globals.user = pypingcli.util.safeInput(message="\rNew Username.>")
+        elif run == 'Go online':
+            pypingcli.sockets.chat_client(globals.internetServerIP)
 
 
 def printPrompt(options):

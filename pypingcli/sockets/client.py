@@ -4,9 +4,9 @@ import sys, socket, select
 import globals
 import pypingcli.util
 
-def chat_client():
+def chat_client(argHost=None):
 
-    host = pypingcli.util.safeInput(message="Enter host address to connect to.\n.>")
+    host = argHost if argHost is not None else pypingcli.util.safeInput(message="Enter host address to connect to.\n.>")
     port = int(globals.port)
      
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -38,11 +38,11 @@ def chat_client():
                 else :
                     #print data
                     sys.stdout.write(data)
-                    sys.stdout.write('.{:=^10}>s '.format(globals.user)); sys.stdout.flush()     
+                    sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush()     
             
             else :
                 # user entered a message
                 msg = sys.stdin.readline()
                 s.send('.{:=^10}> {}'.format(globals.user,msg))
-                sys.stdout.write('.{:=^10s}> '.format(globals.user)); sys.stdout.flush() 
+                sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush() 
 
