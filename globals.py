@@ -9,6 +9,7 @@ def init():
     global configFile
     global user
     global state
+    global port
     thisDir = abspath(dirname(__file__))
     configFile = join(thisDir, 'config.json')
     user = None
@@ -20,6 +21,7 @@ def init():
         'listening' : False,
         'pinging' : False
     }
+    port = 9009
 
 def loadConfig():
     global user

@@ -44,7 +44,7 @@ def main():
             command = [command[1] for command in commands if command[0] != 'Base'][0]
             command = command(options)
             command.run()
-    startDaemonServer()
+    # startDaemonServer()
     while invokePrompt() != -1:
         pass
     sys.exit(0)

@@ -1,43 +1,48 @@
-#!/usr/bin/env python3
+# chat_client.py
 
-import socket
-import json
+import sys, socket, select
 import globals
-from pypingcli.messaging.socketAction import action
-class Client(object):
-    def __init__(self, ip = None):
-        # load additional Python modules
-        import socket  
-        import time
+import pypingcli.util
 
-        # create TCP/IP socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        if ip == None:
-            ip_address = raw_input('Enter IP(IPv4) to connect to: ')
-        else:
-            ip_address = ip_address
-        server_address = (ip_address, 23456)  
-        sock.connect(server_address)  
-        print ("connecting to %s" % (ip_address))
-        init = json.dumps({'e':'name','dir':'get'})
-        sock.sendall(init)
-        time.sleep(2)
-        init = json.dumps({'e':'name','dir':'post','d':globals.user})
-        sock.sendall(init)
-        time.sleep(2)
-        init = json.dumps({'e':'msg','d':"Hi!"})
-        sock.sendall(init)
-        # sock.sendall(init)
-        # while True
-        # define example data to be sent to the server
-        # temperature_data = ["15", "22", "21", "26", "25", "19"]  
-        # for entry in temperature_data:  
-        #     print ("data: %s" % entry)
-        #     new_data = str("temperature: %s\n" % entry).encode("utf-8")
-        #     sock.sendall(new_data)
+def chat_client():
 
-        #     # wait for two seconds
-        #     time.sleep(2)
+    host = pypingcli.util.safeInput(message="Enter host address to connect to.\n.>")
+    port = int(globals.port)
+     
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(2)
+     
+    # connect to remote host
+    try :
+        s.connect((host, port))
+    except :
+        print 'Unable to connect'
+        sys.exit()
 
-        # # close connection
-        sock.close()  
+    print 'Connected to remote host. You can start sending messages'
+    sys.stdout.write('.{}> '.format(globals.user)); sys.stdout.flush()
+     
+    while 1:
+        socket_list = [sys.stdin, s]
+         
+        # Get the list sockets which are readable
+        read_sockets, write_sockets, error_sockets = select.select(socket_list , [], [])
+         
+        for sock in read_sockets:            
+            if sock == s:
+                # incoming message from remote server, s
+                data = sock.recv(4096)
+                if not data :
+                    print '\nDisconnected from chat server'
+                    sys.exit()
+                else :
+                    #print data
+                    sys.stdout.write(data)
+                    sys.stdout.write('.{}> '.format(globals.user)); sys.stdout.flush()     
+            
+            else :
+                # user entered a message
+                msg = sys.stdin.readline()
+                s.send('.{}> {}'.format(globals.user,msg))
+                sys.stdout.write('.{}> '.format(globals.user)); sys.stdout.flush() 
+

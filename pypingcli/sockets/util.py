@@ -1,7 +1,9 @@
 import socket
 import threading 
 import os
-from pypingcli.sockets import Server
+import globals
+from time import sleep
+# from pypingcli.sockets import Server
 
 def getSelfIP():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -10,8 +12,18 @@ def getSelfIP():
     s.close()
     return localIPAddr
 
+def test2(stateDict):
+    k = 0
+    while True:
+        if stateDict["connected"]== 't':
+            return
+        stateDict["connected"] = k
+        sleep(2)
+        k+=1
+
 def startDaemonServer():
-    t1 = threading.Thread(target=Server, name='t1')
+    t1 = threading.Thread(target=test2, name='t1',args=[globals.state])
     t1.daemon = True
     t1.start() 
+    return t1
     

@@ -1,6 +1,7 @@
 import globals
 import sys
-from pypingcli import sockets
+import pypingcli.sockets
+import pypingcli.util
 from pypingcli.messaging.socketAction import sendMsg
 def invokePrompt():
     """State based prompt calls."""
@@ -14,15 +15,25 @@ def invokePrompt():
             sendMsg()
         
     else:
-        commands = ['connect','edit username','ping IP','my IP']
+        commands = ['connect','accept','ter','edit username','ping IP','my IP']
         run = printPrompt(commands)
+        threadVar = None
         if run == -1:
             return -1
         elif run == "connect":
-            sockets.Client()
+            pypingcli.sockets.chat_client()
+            # pypingcli.sockets.server.test()
+            # print("threadVar.isAlive()",threadVar.isAlive() if threadVar else "None")
+            # sockets.Client()
+        # elif run == "ter":
+        #     globals.state['connected'] = 't'
         elif run == "accept":
-            sockets.Server()
-
+            # threadVar = pypingcli.sockets.util.startDaemonServer()
+            pypingcli.sockets.chat_server()
+            # sockets.Server()
+            # pass
+        elif run == 'edit username':
+            globals.user = pypingcli.util.safeInput(message="\rNew Username.>")
 
 
 def printPrompt(options):
