@@ -1,12 +1,12 @@
 # chat_server.py
  
-import sys, socket, select
+import sys, socket, select, os
 import globals
 import pypingcli.util
 HOST = '' 
 SOCKET_LIST = []
 RECV_BUFFER = 4096 
-PORT = 9009#globals.port
+PORT = 9009 # globals.port
 def test():
     # globals.state['connected'] = True
     print("globals.state['connected']",globals.state['connected'])
@@ -17,27 +17,22 @@ def chat_server():
     server_socket.listen(1)
     # add server socket object to the list of readable connections
     SOCKET_LIST.append(server_socket)
-    print "Chat server started on port " + str(PORT)
+    # state and data storages
     clientName = None
     pubKey = False
     sslEstablished = False
 
     while 1:
-        # get the list sockets which are ready to be read through select
-        # 4th arg, time_out  = 0 : poll and never block
         ready_to_read,ready_to_write,in_error = select.select([sys.stdin] + SOCKET_LIST,[],[])
         for sock in ready_to_read:
             # a new connection request recieved
             if sock == server_socket:
                 sockfd, addr = server_socket.accept()
                 SOCKET_LIST.append(sockfd)
-                # print "Client (%s, %s) connected" % addr
-                # broadcast(server_socket, sockfd, "[%s:%s] entered our chatting room\n" % addr)
-                sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush()
+                sys.stdout.write('\r.{:=^10}> '.format(globals.user)); sys.stdout.flush()
             elif sock == sys.stdin:
                 msg = sys.stdin.readline()
-                broadcast(server_socket, sock, "\r" + '.{:=^10}> {}'.format(globals.user,msg))
-                # sys.stdout.write('\r.{:=^10}> '.sformat(globals.user)); sys.stdout.flush()
+                broadcast(server_socket, sock, msg)
             # a message from a client, not a new connection
             else:
                 # process data recieved from client,
@@ -46,7 +41,10 @@ def chat_server():
                     data = sock.recv(RECV_BUFFER)
                     if data:
                         if sslEstablished:
-                            broadcast(server_socket, sock, "\r" + data) #some leak here
+                            if data[:11]=='/ciphermsg:':
+                                sys.stdout.write('\r.{:=^10}> {}'.format(clientName,globals.keyMgrInstance.decrypt(data[11:])))
+                            else:
+                                broadcast(server_socket, sock, "\r" + data) #some leak here
                             sys.stdout.write('\r.{:=^10}> '.format(globals.user)); sys.stdout.flush()
                         elif not clientName:
                             if data[:4] == "/im:":
@@ -78,6 +76,7 @@ def chat_server():
                                 continue
                         elif data == '/secureconn:':
                             sslEstablished = True
+                            os.system('clear')
                             sys.stdout.write("\nEstablished secure connection with '{}'\n".format(clientName))
                             sock.send('/im:{}'.format(globals.user))
                             sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush() 
@@ -86,27 +85,24 @@ def chat_server():
                         # remove the socket that's broken    
                         if sock in SOCKET_LIST:
                             SOCKET_LIST.remove(sock)
-
-                        # at this stage, no data means probably the connection has been broken
                         broadcast(server_socket, sock, "Client (%s, %s) is offline\n" % addr) 
 
-                # exception 
                 except:
                     broadcast(server_socket, sock, "Client (%s, %s) is offline\n" % addr)
                     continue
 
     server_socket.close()
-    
-# broadcast chat messages to all connected clients
+
+# @todo
 def broadcast(server_socket, sock, message):
-    if message[0] == '/' or message[1] == '/':
+    if (len(message)>0 and message[0] == '/') or (len(message)>1 and message[1] == '/'):
         return
-    sys.stdout.write(message+"\033[K");sys.stdout.flush()
+    sys.stdout.write('\r.{:=^10}> {}'.format(globals.user,message));sys.stdout.flush()
     for socket in SOCKET_LIST:
         # send the message only to peer
         if socket != server_socket and socket != sock :
             try :
-                socket.send(message)
+                socket.send('/ciphermsg:' + globals.keyMgrInstance.encrypt(message))
             except :
                 # broken socket connection
                 socket.close()

@@ -1,6 +1,6 @@
 # chat_client.py
 
-import sys, socket, select
+import sys, socket, select, os
 import globals
 import pypingcli.util
 from pypingcli.cryptoManager.keyManager import KeyManager
@@ -17,7 +17,7 @@ def chat_client(argHost=None):
     symmkeyRecieved = False
     keyMgrInstance = KeyManager()
     sslEstablished = False
-
+    remoteUserName = None
     # generate keys
     pubKey = None
     # print("1",keyMgrInstance.keyStatus())
@@ -54,7 +54,10 @@ def chat_client(argHost=None):
                     sys.exit()
                 else :
                     if sslEstablished:
-                        sys.stdout.write(data)
+                        if data[:11]=='/ciphermsg:':
+                            sys.stdout.write('\r.{:=^10}> {}'.format(remoteUserName,keyMgrInstance.decrypt(data[11:])))
+                        else:
+                            sys.stdout.write(data)
                         sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush()
                     elif not accepted:
                         if data == "/asymkey?:":
@@ -79,7 +82,9 @@ def chat_client(argHost=None):
                     elif not sslEstablished:
                         if data[:4] == "/im:":
                             sslEstablished = True
-                            sys.stdout.write("\nEstablished secure connection with '{}'\n".format(data[4:]))
+                            os.system('clear')
+                            remoteUserName = data[4:]
+                            sys.stdout.write("\nEstablished secure connection with '{}'\n".format(remoteUserName))
                             sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush() 
                             continue
 
@@ -88,6 +93,6 @@ def chat_client(argHost=None):
                     continue
                 # user entered a message
                 msg = sys.stdin.readline()
-                s.send('.{:=^10}> {}'.format(globals.user,msg))
+                s.send('/ciphermsg:' + keyMgrInstance.encrypt(msg))
                 sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush() 
 

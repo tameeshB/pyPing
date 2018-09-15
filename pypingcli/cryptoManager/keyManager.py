@@ -13,6 +13,7 @@ class KeyManager(AESCipher):
         self.__privKey = None
         self.__symmKey = None
         self.RSAInstance = None
+        # self.bs = 32
         # self.AESInstance = None # Inherited
     def generateSymmKey(self):
         self.__symmKey = self.gen_password(32)
@@ -48,8 +49,8 @@ class KeyManager(AESCipher):
                     symmKeyCipherText.decode('base64', 'strict')
                     )
             )
+        self.setKeyHash(self.__symmKey)
         if len(self.__symmKey) == 32:
-            self.setKeyHash(self.__symmKey)
             return True
         else:
             return False
