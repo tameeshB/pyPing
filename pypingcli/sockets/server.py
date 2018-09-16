@@ -3,13 +3,12 @@
 import sys, socket, select, os
 import globals
 import pypingcli.util
+import pypingcli.sockets.util
 HOST = '' 
 SOCKET_LIST = []
 RECV_BUFFER = 4096 
 PORT = 9009 # globals.port
-def test():
-    # globals.state['connected'] = True
-    print("globals.state['connected']",globals.state['connected'])
+
 def chat_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -17,6 +16,7 @@ def chat_server():
     server_socket.listen(1)
     # add server socket object to the list of readable connections
     SOCKET_LIST.append(server_socket)
+    print("Waiting for connections on  {}...".format(pypingcli.sockets.util.getSelfIP()))
     # state and data storages
     clientName = None
     pubKey = False
@@ -32,7 +32,13 @@ def chat_server():
                 sys.stdout.write('\r.{:=^10}> '.format(globals.user)); sys.stdout.flush()
             elif sock == sys.stdin:
                 msg = sys.stdin.readline()
-                broadcast(server_socket, sock, msg)
+                if msg and msg[0] == '/':
+                    if msg[:2] == "/q":
+                        broadcast(server_socket, sock, msg, True)
+                        pypingcli.util.progTerm(message="",exitCode=0)
+                else:
+                    broadcast(server_socket, sock, msg)
+
             # a message from a client, not a new connection
             else:
                 # process data recieved from client,
@@ -43,6 +49,8 @@ def chat_server():
                         if sslEstablished:
                             if data[:11]=='/ciphermsg:':
                                 sys.stdout.write('\r.{:=^10}> {}'.format(clientName,globals.keyMgrInstance.decrypt(data[11:])))
+                            elif data[:2] == "/q":
+                                pypingcli.util.progTerm(message="{} is offline\n".format(clientName),exitCode=0)
                             else:
                                 broadcast(server_socket, sock, "\r" + data) #some leak here
                             sys.stdout.write('\r.{:=^10}> '.format(globals.user)); sys.stdout.flush()
@@ -77,7 +85,7 @@ def chat_server():
                         elif data == '/secureconn:':
                             sslEstablished = True
                             os.system('clear')
-                            sys.stdout.write("\nEstablished secure connection with '{}'\n".format(clientName))
+                            sys.stdout.write("\nEstablished secure connection with '{}'\nType /q to quit.\n".format(clientName))
                             sock.send('/im:{}'.format(globals.user))
                             sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush() 
                             continue
@@ -85,25 +93,31 @@ def chat_server():
                         # remove the socket that's broken    
                         if sock in SOCKET_LIST:
                             SOCKET_LIST.remove(sock)
-                        broadcast(server_socket, sock, "Client (%s, %s) is offline\n" % addr) 
+                        broadcast(server_socket, sock, "{} is offline\n".format(clientName)) 
+                        pypingcli.util.progTerm(message="Connection closed by remote connection.",exitCode=0)
 
                 except:
-                    broadcast(server_socket, sock, "Client (%s, %s) is offline\n" % addr)
+                    broadcast(server_socket, sock, "{} is offline\n".format(clientName))
+                    pypingcli.util.progTerm(message="Connection closed by remote connection.",exitCode=0)
                     continue
 
     server_socket.close()
 
 # @todo
-def broadcast(server_socket, sock, message):
-    if (len(message)>0 and message[0] == '/') or (len(message)>1 and message[1] == '/'):
+def broadcast(server_socket, sock, message, isCommand = False):
+    if not isCommand and (len(message)>0 and message[0] == '/') or (len(message)>1 and message[1] == '/'):
         return
     # sys.stdout.write('\r.{:=^10}><> {}'.format(globals.user,message));sys.stdout.flush()
-    sys.stdout.write('\r.{:=^10}> '.format(globals.user)); sys.stdout.flush()
+    if not isCommand:
+        sys.stdout.write('\r.{:=^10}> '.format(globals.user)); sys.stdout.flush()
     for socket in SOCKET_LIST:
         # send the message only to peer
         if socket != server_socket and socket != sock :
             try :
-                socket.send('/ciphermsg:' + globals.keyMgrInstance.encrypt(message))
+                if isCommand:
+                    socket.send(message)
+                else:
+                    socket.send('/ciphermsg:' + globals.keyMgrInstance.encrypt(message))
             except :
                 # broken socket connection
                 socket.close()

@@ -37,16 +37,19 @@ def main():
     os.system('clear')
     options = docopt(__doc__, version=VERSION)
     # print(options)
-    for k, v in options.iteritems():
-        if hasattr(commands, k):
-            module = getattr(commands, k)
-            commands = getmembers(module, isclass)
-            command = [command[1] for command in commands if command[0] != 'Base'][0]
-            command = command(options)
-            command.run()
-    # startDaemonServer()
-    while invokePrompt() != -1:
-        pass
+    try:
+        for k, v in options.iteritems():
+            if hasattr(commands, k):
+                module = getattr(commands, k)
+                commands = getmembers(module, isclass)
+                command = [command[1] for command in commands if command[0] != 'Base'][0]
+                command = command(options)
+                command.run()
+        # startDaemonServer()
+        while invokePrompt() != -1:
+            pass
+    except KeyboardInterrupt:
+        print("\nProgram ended by user keyboard interrupt.\n")
     sys.exit(0)
     
     

@@ -56,6 +56,8 @@ def chat_client(argHost=None):
                     if sslEstablished:
                         if data[:11]=='/ciphermsg:':
                             sys.stdout.write('\r.{:=^10}> {}'.format(remoteUserName,keyMgrInstance.decrypt(data[11:])))
+                        elif data[:2] == "/q":
+                            pypingcli.util.progTerm(message="{} is offline\n".format(remoteUserName),exitCode=0)
                         else:
                             sys.stdout.write(data)
                         sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush()
@@ -84,7 +86,7 @@ def chat_client(argHost=None):
                             sslEstablished = True
                             os.system('clear')
                             remoteUserName = data[4:]
-                            sys.stdout.write("\nEstablished secure connection with '{}'\n".format(remoteUserName))
+                            sys.stdout.write("\nEstablished secure connection with '{}'\nType /q to quit.\n".format(remoteUserName))
                             sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush() 
                             continue
 
@@ -93,6 +95,10 @@ def chat_client(argHost=None):
                     continue
                 # user entered a message
                 msg = sys.stdin.readline()
+                if msg and msg[0] == '/':
+                    if msg[:2] == "/q":
+                        s.send(msg)
+                        pypingcli.util.progTerm(message="",exitCode=0)
                 s.send('/ciphermsg:' + keyMgrInstance.encrypt(msg))
                 sys.stdout.write('.{:=^10}> '.format(globals.user)); sys.stdout.flush() 
 

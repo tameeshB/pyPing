@@ -17,7 +17,7 @@ def safeInput(message = "", essential = False, name = None, tries = 1):
 
 def progTerm(message="",exitCode = 1, silent = False):
     if not silent:
-        print("\tTerminating program with exit code %d.\n\t%s" % exitCode, message)
+        print("\tTerminating program with exit code {}.\n\t{}".format(exitCode, message))
     sys.exit(exitCode)
 
 class _Getch:
