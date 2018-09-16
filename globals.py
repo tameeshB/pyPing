@@ -16,7 +16,7 @@ def init():
     thisDir = abspath(dirname(__file__))
     configFile = join(thisDir, 'config.json')
     user = None
-    internetServerIP = '35.200.238.63'
+    internetServerIP = '<Public-IP-here>'
     keyMgrInstance = KeyManager()
     state = {
         'connected' : False,
