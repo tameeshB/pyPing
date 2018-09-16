@@ -26,7 +26,7 @@ setup(
     name = 'pypingcli',
     version = __version__,
     license='MIT',
-    long_description=open('README').read(),
+    long_description=open('README.md').read(),
     url='https://github.com/tameeshB/pyPingCLI',
     author='Tameesh Biswas',
     author_email='g@tameesh.in',
