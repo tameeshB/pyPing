@@ -97,7 +97,8 @@ def chat_server():
 def broadcast(server_socket, sock, message):
     if (len(message)>0 and message[0] == '/') or (len(message)>1 and message[1] == '/'):
         return
-    sys.stdout.write('\r.{:=^10}> {}'.format(globals.user,message));sys.stdout.flush()
+    # sys.stdout.write('\r.{:=^10}><> {}'.format(globals.user,message));sys.stdout.flush()
+    sys.stdout.write('\r.{:=^10}> '.format(globals.user)); sys.stdout.flush()
     for socket in SOCKET_LIST:
         # send the message only to peer
         if socket != server_socket and socket != sock :
