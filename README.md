@@ -2,7 +2,7 @@
 ## End-to-End AES256 Encrypted direct local and global terminal messaging
 
 ## Installation
-```pip install .```
+```pip install pypingcli```
 ## Usage
 ```pyping start```
 ## Peer-To-Peer Architecture 
